@@ -7,16 +7,12 @@ The original url looks like: https://raw.githubusercontent.com/UserName/...
 
 Note: Do not enter the file extension
 ```
-wget tinyurl.com/elca<filename>
-```
-Step-2: Copy the url from the response and paste the <URL> in the following command
-```
-wget <URL>
+wget raw.githubusercontent.com/KishanKokal/elca/main/ai/filename.py
 ```
 
 ## Windows
 Note-1: Open PowerShell
 Note-2: Do not add file extension in the url
 ```
-Invoke-WebRequest -Uri tinyurl.com/elca<filename> -OutFile <filename>.py
+Invoke-WebRequest -Uri raw.githubusercontent.com/KishanKokal/elca/main/ai/filename.py -OutFile filename.py
 ```
