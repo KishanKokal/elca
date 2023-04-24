@@ -1,0 +1,1004 @@
+LEX Program:
+
+Q1) Vowel and consonants:
+
+%{
+int flag;
+void display(int flag, char *s);
+%}
+
+%%
+[aeiouAEIOU] {flag=1; display(flag, yytext);}
+. {flag=2; display(flag, yytext);}
+%%
+
+void main() {
+	printf("Enter String:\n");
+	yylex();
+}
+
+void display(int flag, char *str) {
+	if (flag == 1) {
+		printf("%s is a Vowel\n", str);
+	} else {
+		printf("%s is a Consonant\n", str);
+	}
+}
+
+Q2)word or number or combo of both:
+
+%{
+int flag;
+void display(int flag,char *s);
+%}
+
+%%
+[a-zA-Z]* {flag=1;display(flag,yytext);}
+[0-9]* {flag=2;display(flag,yytext);}
+[a-zA-Z0-9]* {flag=0;display(flag,yytext);}
+%%
+
+void main(){
+	printf("Enter the word\n");
+	yylex();
+
+}
+
+void display(int flag,char *s){
+	if(flag==0){
+		printf("%s is combo",s);
+	}else if(flag==1){
+		printf("%s is word",s);
+	}else if(flag==2){
+		printf("%s is number",s);
+	}
+}
+
+Q3)No. of lines, words, chars:
+
+%{
+int lcount=1,wcount=0,ccount=0;
+%}
+
+%% 
+
+\n {lcount++;ccount++;}
+[a-zA-Z]+ {wcount++;ccount+=strlen(yytext);}
+. {ccount++;}
+
+%%
+void main(){
+printf("Enter some text\n");
+yylex();
+printf("word cnt= %d",wcount);
+printf("Line cnt= %d",lcount);
+printf("Character cnt= %d",ccount);
+}
+
+Q4)Lexical Analyser:
+
+%{
+int flag;
+void display(int flag, char *str);
+%}
+
+%%
+[ ] {}
+(if)|(else)|(for)|(False)|(True)|(None)|(break)|(continue)(def)|(elif)|(else)|(in) {flag=0;display(flag,yytext);}
+[+|-|*|/|=] {flag=1;display(flag,yytext);}
+[;|:|'|"|.|,|\[|\]|\(|\)|\{|\}] {flag=2;display(flag,yytext);}
+[a-zA-Z_][a-zA-Z0-9_]* {flag=3;display(flag,yytext);}
+. {flag=4;display(flag,yytext);}
+%%
+
+void main() {
+	printf("Enter Code:\n");
+	yylex();
+}
+
+void display(int flag, char *str) {
+	if (flag == 0) {
+		printf("%s is Keyword\n", str);
+	}else if (flag == 1) {
+		printf("%s is Operator\n", str);
+	}else if (flag == 2) {
+		printf("%s is Seperator\n", str);
+	}else if (flag == 3) {
+		printf("%s is Identifier\n", str);
+	}else {
+		printf("%s is Literal\n", str);
+	}
+}
+
+Q5)print hello 
+
+%{
+char s[20];
+char ch;
+%}
+
+%%
+\n {printf("Hello %s", s);return 1;}
+%%
+
+void main() {
+	do {
+		printf("Enter Name: ");
+		scanf("%s", s);
+		yylex();
+		printf("\nContinue(y/n):");
+		scanf("%c", &ch);
+	} while (ch == 'y');
+}
+
+
+
+
+
+
+
+
+
+
+Practical Prgrams:
+
+Q1)lexical Analysis:
+
+Code:
+
+import keyword
+import re
+
+keywords = keyword.kwlist
+operators = ['+', '-', '*', '/', '=', '==', '%']
+seperators = ['"',"'", ',', ';', ":", '(', ')', '[', ']', '{', '}', '#', '|']
+identifier = re.compile(r'[a-zA-Z_][\w_]*')
+tokenizer = re.compile(r'\b\w+\b|\+|\-|\*|\/|\=|\=\=|\%|\"|\'|\,\;|\:|\(|\)|\[|\]|\{|\}|\#|\|')
+
+with open('lex_input.txt') as f:
+    for l in f.readlines():
+        tokens = tokenizer.findall(l)
+        for token in tokens:
+            if token in keywords:
+                print(f"{token}\t=>\tKeyword")
+            elif token in operators:
+                print(f"{token}\t=>\tOperator")
+            elif token in seperators:
+                print(f"{token}\t=>\tSeperator")
+            elif identifier.fullmatch(token):
+                print(f"{token}\t=>\tIdentifier")
+            else:
+                print(f"{token}\t=>\tLiteral")
+
+Input:
+
+for i in range(99):
+    print(i)
+
+a = 1
+b = 2
+c = a + b
+
+
+
+
+
+Q2)Macroprocessor:
+
+Code:
+
+MDT = []
+MNT = []
+ALA = []
+MDTC = MNTC = 0
+
+with open("macroprocessor.txt") as f:
+    code = []
+    for l in f.readlines():
+        l = l.strip()
+        code.append(l)
+
+i = 0
+while i < len(code):
+    if code[i] == 'MACRO':
+        i += 1
+        macro = []
+        while code[i] != 'MEND':
+            macro.append(code[i])
+            i += 1
+        macro.append('MEND')
+
+        for j in macro[0].split():
+            if j[0] != '&':
+                MNT.append((j, MDTC))
+            else:
+                ALA.append(j)
+
+        for j in macro:
+            l = ""
+            for k in j.split():
+                if k in ALA:
+                    l += '#' + str(ALA.index(k)) + " "
+                else:
+                    l += k + " "
+            MDT.append(l)
+
+        MDTC = i
+    i += 1
+print("\nMacro Definition Table:")
+print("Index\t\tDefinition")
+for ii, i in enumerate(MDT):
+    print(f"{ii}\t\t\t{i}")
+# print(MDT)
+print("\nMacro Name Table:")
+print("Index\t\tName\t\t\tMDT Index")
+for ii, i in enumerate(MNT):
+    print(f"{ii}\t\t\t{i[0]:b<8}\t\t\t{i[1]}")
+# print(MNT)
+print("\nArgument List Array:")
+print("Index\t\tArgument")
+for ii, i in enumerate(ALA):
+    print(f"{ii}\t\t\t{i[1:]:b<8}")
+# print(ALA)
+
+Input:
+
+MACRO
+&LABEL INCR1 &ARG1 &ARG2 &ARG3
+    &LABEL A 1, &ARG1
+           A 2, &ARG2
+           A 3, &ARG3
+MEND
+
+
+
+
+
+Q3)Left Recursion:
+    
+Code:
+    
+import re
+from string import ascii_uppercase
+
+grammar = {}
+
+# Reading Input File
+with open("left_recursion_input.txt") as f:
+    for l in f.readlines():
+        tokens = re.split(" |->|\n|\|", l)
+        leftProd = tokens.pop(0)
+        rightProd = []
+        for t in tokens[1:]:
+            if t != '':
+                rightProd.append(t)
+        grammar[leftProd] = rightProd
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+remaining = {*ascii_uppercase} - {i for i in grammar}
+
+new_grammar = {}
+for i in grammar:
+    alpha = []
+    beta = []
+    found = False
+    for j in grammar[i]:
+        if j[0] == i:
+            found = True
+            alpha.append(j[1:])
+        else:
+            beta.append(j)
+    if found:
+        k = remaining.pop()
+        new_grammar[i] = [c+k for c in beta]
+        new_grammar[k] = [c+k for c in alpha] + ['@']
+    else:
+        new_grammar[i] = grammar[i]
+
+if grammar == new_grammar:
+    print("\nNo Left Recursion Found")
+else:
+    print(f"\nGrammar After removing Left Recursion:")
+    for k, v in new_grammar.items():
+        print(f"{k} => {v}")
+
+Input:
+
+A -> ABd | Aa | a
+B -> Be | b
+
+
+
+
+Q5)Left Factoring:
+    
+Code:
+
+import re
+from collections import Counter, defaultdict
+from string import ascii_uppercase
+
+grammar = {}
+
+# Reading Input File
+with open("left_factoring_input.txt") as f:
+    for l in f.readlines():
+        tokens = re.split(" |->|\n|\|", l)
+        leftProd = tokens.pop(0)
+        rightProd = []
+        for t in tokens[1:]:
+            if t != '':
+                rightProd.append(t)
+        grammar[leftProd] = rightProd
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+remaining = {*ascii_uppercase} - {i for i in grammar}
+
+new_grammar = defaultdict(list)
+while True:
+    for i in grammar:
+        c = Counter()
+        alpha = defaultdict(list)
+        for j in grammar[i]:
+            c[j[0]] += 1
+            alpha[j[0]].append(j[1:])
+        for j in c.most_common():
+            if j[1] > 1:
+                k = remaining.pop()
+                new_grammar[i].append(j[0]+k)
+                new_grammar[k] = alpha[j[0]]
+            else:
+                new_grammar[i].append(j[0]+alpha[j[0]][0])
+
+    if grammar == new_grammar:
+        print("\nNo More Left Factoring Found")
+        break
+    else:
+        print(f"\nGrammar After Left Factoring:")
+        for k, v in new_grammar.items():
+            print(f"{k} => {v}")
+        grammar = new_grammar
+        new_grammar = defaultdict(list)
+
+Input:
+    
+A -> aAB | aBc | aAc
+
+
+
+
+Q6)First:
+
+Code:
+
+import re
+from collections import defaultdict
+
+grammar = {}
+with open("Q6.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        grammar[prod[0]]= prod[1:]
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+def cal_first(s):
+    if not s.isupper():
+        return {s}
+    if first[s]:
+        return first[s]
+    for i in grammar[s]:
+        j = 0
+        if i[j].isupper():
+            f = cal_first(i[j]).copy()
+            j += 1
+            while j < len(i) and '@' in f:
+                f.remove('@')
+                first[s].update(f)
+                f = cal_first(i[j]).copy()
+                j += 1
+            first[s].update(f)
+        else:
+            first[s].add(i[j])
+    return first[s]
+
+for p in grammar:
+    cal_first(p)
+print("\nFirst:")
+for k, v in first.items():
+    print(f"{k} => {v}")
+
+Input:
+
+E -> TR
+R -> +TR | @
+T -> FY
+Y -> *FY | @
+F -> (E) | a
+
+
+
+
+Q7)Follow:
+    
+Code:
+    
+import re
+from collections import defaultdict
+
+grammar = {}
+with open("Q7_g.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        grammar[prod[0]]= prod[1:]
+
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+first = {}
+start = ""
+with open("Q7_f.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        if not start:
+            start = prod[0]
+        first[prod[0]]= prod[1:]
+print("\nFirst:")
+for k, v in first.items():
+    print(f"{k} => {v}")
+
+def cal_first(s):
+    if not s.isupper():
+        return {s}
+    if s in first:
+        return first[s]
+
+follow = defaultdict(set)
+def cal_follow(s):
+    if s in follow:
+        return follow[s]
+    if s == start:
+        follow[s].add('$')
+    for i in grammar:
+        for j in grammar[i]:
+            k = 0
+            while k < len(j):
+                if j[k] == s:
+                    k += 1
+                    if k < len(j):
+                        f = cal_first(j[k]).copy()
+                        while k < len(j) and '@' in f:
+                            f.remove('@')
+                            follow[s].update(f)
+                            k += 1
+                            if k < len(j):
+                                f = cal_first(j[k]).copy()
+                            else:
+                                if i == s:
+                                    break
+                                f = cal_follow(i).copy()
+                                break
+                        follow[s].update(f)
+                    else:
+                        if i == s:
+                            break
+                        f = cal_follow(i).copy()
+                        follow[s].update(f)
+                        break
+                k += 1
+    return follow[s]
+
+for p in grammar:
+    cal_follow(p)
+print("\nFollow:")
+for k, v in follow.items():
+    print(f"{k} => {v}")
+
+Input:
+
+Q7_g.txt:
+
+E -> TR
+R -> +TR | @
+T -> FY
+Y -> *FY | @
+F -> (E) | a
+
+Q7_f.txt:
+
+E -> ( | a
+R -> + | @
+T -> ( | a
+Y -> * | @
+F -> ( | a
+
+
+
+
+Q8)LL1 Parser:
+
+Code:
+
+import re
+from collections import defaultdict
+from pandas import DataFrame
+
+grammar = {}
+with open("Q8_g.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        grammar[prod[0]]= prod[1:]
+
+print("\nGrammmer:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+first = {}
+with open("Q8_fi.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        first[prod[0]]= prod[1:]
+
+print("\nFirst:")
+for k, v in first.items():
+    print(f"{k} => {v}")
+follow = {}
+with open("Q8_fo.txt") as f:
+    for l in f.readlines():
+        prod = []
+        tmp = re.split(r' |->|\||\n', l)
+        for i in tmp:
+            if i != '':
+                prod.append(i)
+        follow[prod[0]]= prod[1:]
+
+print("\nFollow:")
+for k, v in follow.items():
+    print(f"{k} => {v}")
+def cal_first(s):
+    if not s.isupper():
+        return {s}
+    if s in first:
+        return first[s]
+
+def cal_follow(s):
+    if s in follow:
+        return follow[s]
+
+table = defaultdict(dict)
+def parser():
+    for i in grammar:
+        for j in grammar[i]:
+            if j == '@':
+                f = cal_follow(i)
+                for k in f:
+                    table[k][i] = j
+            else:
+                f = cal_first(j[0])
+                for k in f:
+                    table[k][i] = j
+parser()
+print("\nParse Table:")
+print(DataFrame(table).fillna('-'))
+
+
+Input:
+
+Q8_g.txt:
+
+E -> TR
+R -> +TR | @
+T -> FY
+Y -> *FY | @
+F -> (E) | a
+
+Q8_fi.txt:
+
+E -> ( | a
+R -> + | @
+T -> ( | a
+Y -> * | @
+F -> ( | a
+
+Q8_fo.txt:
+
+E -> $ | )
+R -> $ | )
+T -> $ | ) | +
+Y -> $ | + | )
+F -> $ | * | ) | +
+
+
+
+
+Q9)TAC:
+
+Code:
+
+infix = input("Enter Expression: ")
+
+operators = {'+': 1, '-': 1, '/': 2, '*': 2, '^': 3, '(': 0, '=': 0}
+
+def infixToPostfix(infix):
+    stack = []
+    postfix = ""
+
+    for ii, i in enumerate(infix):
+        # print(i, stack, postfix)
+        if i == " ":
+            continue
+        if i.isalnum():
+            postfix += i
+        elif i == '(':
+            stack.append(i)
+        elif i == ')':
+            while stack[-1] != '(':
+                postfix += stack.pop()
+            stack.pop()
+        else:
+            if infix[ii-1] in operators:
+                postfix += 'u'
+            else:
+                while stack and operators[i] <= operators[stack[-1]]:
+                    postfix += stack.pop()
+                stack.append(i)
+    while stack:
+        postfix += stack.pop()
+    return postfix
+
+
+exp = infixToPostfix(infix)
+print("Postfix:", exp)
+
+tac = {}
+stack = []
+i = j = 0
+while i < len(exp):
+    # print(exp[i], tac, stack)
+    if exp[i] == 'u':
+        tac['t'+str(j)] = '-'+exp[i+1]
+        stack.append('t'+str(j))
+        i += 2
+        j += 1
+    elif exp[i] in operators:
+        op2 = stack.pop()
+        op1 = stack.pop()
+        tac['t'+str(j)] = f"{op1} {exp[i]} {op2}"
+        stack.append('t'+str(j))
+        i += 1
+        j += 1
+    else:
+        stack.append(exp[i])
+        i += 1
+for k, v in tac.items():
+    if '=' in v:
+        print(v)
+    else:
+        print(f"{k} = {v}")
+
+Input:
+    
+a=(b*-c)+(b*-c)
+
+
+
+
+
+Q10)Optimization:
+    
+Code:
+    
+lhs = []
+rhs = []
+
+with open('optimization.txt') as f:
+    for l in f.readlines():
+        tmp = [i.strip() for i in l.split('=')]
+        lhs.append(tmp[0])
+        rhs.append(tmp[1])
+
+print("Given Code:")
+for i in range(len(lhs)):
+    print(f"{lhs[i]} = {rhs[i]}")
+print()
+
+#dead code elimination
+i = 0
+while i < len(lhs)-1:
+    found = False
+    j = 0
+    while j < len(lhs):
+        if i != j and lhs[i] in rhs[j]:
+            found = True
+            break
+        j += 1
+    if not found:
+        lhs.pop(i)
+        rhs.pop(i)
+    else:
+        i += 1
+
+print("Removing Dead Code:")
+for i in range(len(lhs)):
+    print(f"{lhs[i]} = {rhs[i]}")
+print()
+
+#Eliminate common expression
+i = 0
+while i < len(lhs):
+    j = 0
+    while j < len(lhs):
+        if i != j and rhs[i] == rhs[j]:
+            k = 0
+            while k < len(lhs):
+                if lhs[j] in rhs[k]:
+                    rhs[k] = rhs[k].replace(lhs[j], lhs[i])
+                k += 1
+            lhs.pop(j)
+            rhs.pop(j)
+        j += 1
+    i += 1
+
+print("Eliminating Common Expressions:")
+for i in range(len(lhs)):
+    print(f"{lhs[i]} = {rhs[i]}")
+print()
+
+Input:
+    
+t0 = -c
+t1 = b * t0
+t2 = -c
+t3 = b * t2
+t4 = t1 + t3
+t5 = d
+a = t4
+
+Extras:
+
+Q) First and Follow:
+
+import re
+from collections import defaultdict
+
+grammar = {}
+first = defaultdict(set)
+follow = defaultdict(set)
+start = ""
+
+# Reading Input File
+with open("first_follow_input.txt") as f:
+    for l in f.readlines():
+        tokens = re.split(" |->|\n|\|", l)
+        leftProd = tokens.pop(0)
+        rightProd = []
+        for t in tokens[1:]:
+            if t != '':
+                rightProd.append(t)
+        grammar[leftProd] = rightProd
+        if not start:
+            start = leftProd
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+
+def cal_first(s):
+    if not s.isupper():
+        return {s}
+    if first[s]:
+        return first[s]
+    for i in grammar[s]:
+        j = 0
+        if i[j].isupper():
+            f = cal_first(i[j]).copy()
+            j += 1
+            while j < len(i) and '@' in f:
+                f.remove('@')
+                first[s].update(f)
+                f = cal_first(i[j]).copy()
+                j += 1
+            first[s].update(f)
+        else:
+            first[s].add(i[j])
+    return first[s]
+
+
+def cal_follow(s):
+    if follow[s]:
+        return follow[s]
+    if s == start:
+        follow[s].add('$')
+    for i in grammar:
+        for j in grammar[i]:
+            for k in range(len(j)):
+                if j[k] == s:
+                    l = k + 1
+                    if l < len(j):
+                        f = cal_first(j[l]).copy()
+                        while True:
+                            if '@' in f:
+                                f.remove('@')
+                                follow[s].update(f)
+                                l += 1
+                                if l < len(j):
+                                    f = cal_first(j[l]).copy()
+                                else:
+                                    if i == s:
+                                        break
+                                    f = cal_follow(i).copy()
+                            else:
+                                follow[s].update(f)
+                                break
+                    else:
+                        if i == s:
+                            break
+                        f = cal_follow(i).copy()
+                        follow[s].update(f)
+    return follow[s]
+
+for p in grammar:
+    cal_first(p)
+print("\nFirst:")
+for k, v in first.items():
+    print(f"{k} => {v}")
+
+for p in grammar:
+    cal_follow(p)
+print("\nFollow:")
+for k, v in follow.items():
+    print(f"{k} => {v}")
+
+
+
+
+
+Q)LL1:
+    
+import re
+from collections import defaultdict
+
+import pandas as pd
+
+grammar = {}
+first = defaultdict(set)
+follow = defaultdict(set)
+parseTable = defaultdict(set)
+start = ""
+
+# Reading Input File
+with open("first_follow_input.txt") as f:
+    for l in f.readlines():
+        tokens = re.split(" |->|\n|\|", l)
+        leftProd = tokens.pop(0)
+        rightProd = []
+        for t in tokens[1:]:
+            if t != '':
+                rightProd.append(t)
+        grammar[leftProd] = rightProd
+        if not start:
+            start = leftProd
+print(f"Grammar:")
+for k, v in grammar.items():
+    print(f"{k} => {v}")
+
+
+def cal_first(s):
+    if not s.isupper():
+        return {s}
+    if first[s]:
+        return first[s]
+    for i in grammar[s]:
+        j = 0
+        if i[j].isupper():
+            f = cal_first(i[j]).copy()
+            j += 1
+            while j < len(i) and '@' in f:
+                f.remove('@')
+                first[s].update(f)
+                f = cal_first(i[j]).copy()
+                j += 1
+            first[s].update(f)
+        else:
+            first[s].add(i[j])
+    return first[s]
+
+
+def cal_follow(s):
+    if follow[s]:
+        return follow[s]
+    if s == start:
+        follow[s].add('$')
+    for i in grammar:
+        for j in grammar[i]:
+            for k in range(len(j)):
+                if j[k] == s:
+                    l = k + 1
+                    if l < len(j):
+                        f = cal_first(j[l]).copy()
+                        while True:
+                            if '@' in f:
+                                f.remove('@')
+                                follow[s].update(f)
+                                l += 1
+                                if l < len(j):
+                                    f = cal_first(j[l]).copy()
+                                else:
+                                    if i == s:
+                                        break
+                                    f = cal_follow(i).copy()
+                            else:
+                                follow[s].update(f)
+                                break
+                    else:
+                        if i == s:
+                            break
+                        f = cal_follow(i).copy()
+                        follow[s].update(f)
+    return follow[s]
+
+
+def parser():
+    for i in grammar:
+        for j in grammar[i]:
+            if j == '@':
+                for k in follow[i]:
+                    parseTable[i, k].add(j)
+            else:
+                if j[0].isupper():
+                    for k in first[j[0]]:
+                        parseTable[i, k].add(j)
+                else:
+                    parseTable[i, j[0]].add(j)
+
+
+for p in grammar:
+    cal_first(p)
+print("\nFirst:")
+for k, v in first.items():
+    print(f"{k} => {v}")
+
+for p in grammar:
+    cal_follow(p)
+print("\nFollow:")
+for k, v in follow.items():
+    print(f"{k} => {v}")
+
+parser()
+print("\nParse Table:")
+for k, v in parseTable.items():
+    print(f"{k} => {v}")
+new_table = defaultdict(dict)
+for i, j in parseTable.items():
+    new_table[i[1]][i[0]] = ",".join(j)
+print(pd.DataFrame(new_table).fillna('-'))
+
+
+
+
+

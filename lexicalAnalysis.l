@@ -10,7 +10,7 @@ if|else|while   printf("KEYWORD: %s\n", yytext);
 [ \t\n]         /* ignore whitespace */
 .               printf("UNKNOWN_TOKEN: %s\n", yytext);
 %%
-
+int yywrap() {}
 int main()
 {
     yylex();
