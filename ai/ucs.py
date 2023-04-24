@@ -55,6 +55,7 @@ graph = {
     'E': {'F': 2},
     'F': {}
 }
+
 path, cost = ucs('A', 'F')
 print('Path:', path)
 print('Cost:', cost)
