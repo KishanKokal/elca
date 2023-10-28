@@ -1,4 +1,4 @@
-*************************************************************************** EXP 1 (data preprocessing) *************************************************************
+************* EXP 1 (data preprocessing) *************************************************************
 
 import pandas as pd
 from sklearn.impute import SimpleImputer
@@ -31,7 +31,7 @@ df[['Exam 1 Score', 'Exam 2 Score', 'Exam 3 Score']] = scaler.fit_transform(df[[
 print("Final Preprocessed Dataset:\n", df)
 
 
-*************************************************************************** EXP 2 (Gradient Descent) *************************************************************
+************* EXP 2 (Gradient Descent) *************************************************************
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -61,7 +61,7 @@ plt.title('Gradient Descent Optimization')
 plt.legend()
 plt.show()
 
-*************************************************************************** EXP 3 (Simple Linear) *************************************************************
+************* EXP 3 (Simple Linear) *************************************************************
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -107,7 +107,7 @@ print("Slope:", model.slope[0])
 print("Intercept:", model.intercept)
 
 
-*************************************************************************** EXP 4 (Logistic) *************************************************************
+************* EXP 4 (Logistic) *************************************************************
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -189,7 +189,7 @@ accuracy = match/30
 print("Accuracy is: ", accuracy)
 
 
-*************************************************************************** EXP 6 (SVM) ********************************************************************
+************* EXP 6 (SVM) ********************************************************************
 
 import numpy as np
 from sklearn import datasets
@@ -214,7 +214,7 @@ y_pred))
 print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
 
-*************************************************************************** EXP 7 (Ensemble) ********************************************************************
+************* EXP 7 (Ensemble) ********************************************************************
 
 import numpy as np
 from sklearn.datasets import load_breast_cancer
@@ -282,7 +282,7 @@ print(f"Stacking Accuracy: {stacking_accuracy}")
 
 
 
-*************************************************************************** EXP 8 (PCA) ********************************************************************
+************* EXP 8 (PCA) ********************************************************************
 
 import numpy as np
 import matplotlib.pyplot as plt
